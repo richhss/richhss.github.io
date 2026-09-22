@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>QuickBooks sign-in callback</title>
+  <style>
+    :root { --bg: #fbfaf7; --fg: #1f2933; --muted: #52606d; --accent: #2c6e49; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #14171a; --fg: #e6e9ec; --muted: #9aa5b1; --accent: #7bc9a0; } }
+    body { margin: 0; padding: 48px 16px; background: var(--bg); color: var(--fg); font: 17px/1.6 Georgia, "Times New Roman", serif; }
+    main { max-width: 640px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin: 0 0 .5rem; }
+    p { margin: 0 0 1rem; }
+    a { color: var(--accent); }
+    code { font: .95em ui-monospace, Menlo, Consolas, monospace; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>QuickBooks sign-in callback</h1>
+    <p id="status">Forwarding the authorization response to the local helper on this computer.</p>
+    <p id="fallback" hidden>If nothing happened, the local helper is not running. Start <code>npm run auth</code> in the server directory, then open this link: <a id="link" href="#"></a></p>
+  </main>
+  <script>
+    // Intuit requires an https redirect URI for production keys, while the local
+    // auth helper (intuit/quickbooks-online-mcp-server, `npm run auth`) listens on
+    // http://localhost:8000/callback. This page passes the query string through
+    // untouched. Nothing is stored or sent anywhere else; the code is single-use
+    // and expires within minutes.
+    var target = 'http://localhost:8000/callback' + window.location.search;
+    var link = document.getElementById('link');
+    link.href = target; link.textContent = target;
+    if (window.location.search.length > 1) {
+      setTimeout(function () { document.getElementById('fallback').hidden = false; }, 4000);
+      window.location.replace(target);
+    } else {
+      document.getElementById('status').textContent = 'No authorization response was included in this address.';
+    }
+  </script>
+</body>
+</html>
